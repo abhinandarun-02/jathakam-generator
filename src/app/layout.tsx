@@ -1,10 +1,16 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
-import { Inter } from "next/font/google";
+import { Inter, Manjari } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const manjari = Manjari({
+  subsets: ['latin', 'malayalam'],
+  weight: ['100', '400', '700'],
+  variable: '--font-malayalam',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Jathakam Generator',
@@ -17,19 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", inter.variable)}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manjari:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" className={cn("font-sans", inter.variable, manjari.variable)}>
       <body className="font-malayalam antialiased">
         {children}
         <Toaster />

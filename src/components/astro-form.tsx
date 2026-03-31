@@ -142,7 +142,7 @@ function SelectField({
         <SelectTrigger id={id} aria-label={label} className="w-full">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent position="popper">
           {options.map((option) => (
             <SelectItem key={option} value={option}>
               {option}
@@ -273,21 +273,16 @@ export default function AstroForm({ data, setData }: AstroFormProps) {
                 placeholder="ജനന സ്ഥലം നൽകുക"
               />
             </FormField>
-            <Field>
-              <FieldSet>
-                <FieldLegend className="flex items-center gap-2">
-                  <VenetianMask className="h-4 w-4" />
-                  ലിംഗം
-                </FieldLegend>
+            <FormField id="gender" label="ലിംഗം (Gender)" icon={VenetianMask}>
                 <RadioGroup
                   value={data.gender}
                   onValueChange={handleGenderChange}
-                  className="grid grid-cols-1 gap-3 pt-1 sm:grid-cols-2"
+                  className="grid grid-cols-1 gap-3 sm:grid-cols-2"
                 >
                   {GENDER_OPTIONS.map((option) => (
                     <div
                       key={option.value}
-                      className="flex items-center gap-2 rounded-md border px-3 py-2"
+                      className="flex items-center gap-2 rounded-md border px-3 py-2 lg:h-9"
                     >
                       <RadioGroupItem
                         value={option.value}
@@ -298,8 +293,7 @@ export default function AstroForm({ data, setData }: AstroFormProps) {
                     </div>
                   ))}
                 </RadioGroup>
-              </FieldSet>
-            </Field>
+            </FormField>
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
