@@ -1,16 +1,16 @@
 import type { AstroData } from './types';
 
 export const initialData: AstroData = {
-  name: 'ശ്രീദേവി',
+  name: '',
   dob: '1990-05-15',
   tob: '10:30',
   pob: 'തൃശൂർ',
   gender: 'female',
   predictions: '',
-  age: '34',
+  age: '',
   nakshatra: 'പൂയം',
   address: 'ശ്രീവിലാസം, കോട്ടയം',
-  email: 'sreedevi@example.com',
+  email: '',
   malayalamMonth: 'ഇടവം',
   arudhamRashi: 'ചിങ്ങം',
   deepam: 'നെയ് വിളക്ക്',
