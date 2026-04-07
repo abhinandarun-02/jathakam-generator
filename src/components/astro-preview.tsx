@@ -1,37 +1,72 @@
-'use client';
+"use client";
 
-import type { AstroData } from '@/lib/types';
-
+import type { AstroData } from "@/lib/types";
 
 interface AstroDocumentPreviewProps {
   data: AstroData;
 }
 
-function PreviewField({ label, value }: { label: string; value: React.ReactNode }) {
+function PreviewField({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}) {
   if (!value) return null;
+
   return (
     <div className="flex items-start gap-3">
-      <span className="font-medium w-32 shrink-0">{label}:</span>
+      <span className="w-32 shrink-0 font-medium">{label}:</span>
       <span>{value}</span>
     </div>
   );
 }
 
-export default function AstroDocumentPreview({ data }: AstroDocumentPreviewProps) {
+export default function AstroDocumentPreview({
+  data,
+}: AstroDocumentPreviewProps) {
   const {
-    name, dob, tob, pob, gender, age, nakshatra, address, email,
-    malayalamMonth, arudhamRashi, deepam, prasnaChintha, thamboolamRashi,
-    thamboolam, thamboolamGrahangal, udayaRashikal, lagnaNavamsakam,
-    spashtangaRashi, chandrarishti, pariharangal
+    name,
+    dob,
+    tob,
+    pob,
+    gender,
+    age,
+    nakshatra,
+    address,
+    email,
+    malayalamMonth,
+    arudhamRashi,
+    deepam,
+    prasnaChintha,
+    thamboolamRashi,
+    thamboolam,
+    thamboolamGrahangal,
+    udayaRashikal,
+    lagnaNavamsakam,
+    spashtangaRashi,
+    chandrarishti,
+    pariharangal,
+    pariharaItems,
   } = data;
 
+  const visiblePariharaTemples =
+    pariharaItems
+      ?.flatMap((item) =>
+        (item.temples ?? [])
+          .filter((t) => t.enabled && t.remedy && t.remedy.trim())
+          .map((t) => ({ deity: item.deity, temple: t.name, remedy: t.remedy })),
+      ) ?? [];
 
   return (
-    <div className="printable-area bg-white shadow-lg rounded-lg p-8 h-full w-full overflow-auto space-y-8 text-black">
-      <header className="text-center ">
-        <h1 className="text-xl text-center font-bold border-b pb-2 mb-4">ജ്യോതിഷ രേഖ</h1>
-        <p>ഹരിശ്രീ ഗണപതയേ നമ: അവിഘ്‌നമസ്‌തു.</p>
-        <p>ശ്രീ ഗുരുദ്യോ നമ:</p>
+    <div className="printable-area h-full w-full space-y-8 overflow-auto rounded-lg bg-white p-8 text-black shadow-lg">
+      <header className="text-center">
+        <h1 className="mb-4 border-b pb-2 text-center text-xl font-bold">
+          ജ്യോതിഷ രേഖ
+        </h1>
+        <p>ഹരിശ്രീ ഗണപതയേ നമ: അവിഘ്നമസ്തു.</p>
+        <p>ശ്രീ ഗുരുഭ്യോ നമ:</p>
         <p>ശ്രീ ഗണപതയേ നമ:</p>
         <p>ശ്രീ സരസ്വത്യൈ നമ:</p>
         <p>ശ്രീ വേദവ്യാസായ നമ:</p>
@@ -41,20 +76,42 @@ export default function AstroDocumentPreview({ data }: AstroDocumentPreviewProps
         <p>ശ്രീ കുലദേവതാഭ്യോ നമ:</p>
         <p>ശ്രീ ഹയഗ്രീവായ നമ:</p>
         <p>ശ്രീ ഹരിഹരപുത്രായ നമ:</p>
-        <p></p>
+        <p />
         <p>കോലാപുരവരവാസലോലാം ശക്തിത്രയാത്മികാം</p>
         <p>മൂകാംബികാമീം ഹിതകരീം നമാമി പരദേവതാം</p>
       </header>
 
       <section>
-        <h2 className="text-lg font-bold border-b pb-2 mb-4">വ്യക്തിഗത വിവരങ്ങൾ</h2>
+        <h2 className="mb-4 border-b  text-lg font-bold">
+          വ്യക്തിഗത വിവരങ്ങൾ
+        </h2>
         <div className="space-y-2 text-sm">
           <PreviewField label="പേര്" value={name} />
           <PreviewField label="പ്രായം" value={age} />
-          <PreviewField label="ജനന തീയതി" value={dob ? new Date(dob).toLocaleDateString('ml-IN', { year: 'numeric', month: 'long', day: 'numeric' }) : ''} />
+          <PreviewField
+            label="ജനന തീയതി"
+            value={
+              dob
+                ? new Date(dob).toLocaleDateString("ml-IN", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
+                : ""
+            }
+          />
           <PreviewField label="ജനിച്ച സമയം" value={tob} />
           <PreviewField label="ജനന സ്ഥലം" value={pob} />
-          <PreviewField label="ലിംഗം" value={gender === 'male' ? 'പുരുഷൻ' : gender === 'female' ? 'സ്ത്രീ' : 'മറ്റുള്ളവ'} />
+          <PreviewField
+            label="ലിംഗം"
+            value={
+              gender === "male"
+                ? "പുരുഷൻ"
+                : gender === "female"
+                  ? "സ്ത്രീ"
+                  : "മറ്റുള്ളവ"
+            }
+          />
           <PreviewField label="നക്ഷത്രം" value={nakshatra} />
           <PreviewField label="ഇമെയിൽ" value={email} />
           <PreviewField label="വിലാസം" value={address} />
@@ -62,7 +119,9 @@ export default function AstroDocumentPreview({ data }: AstroDocumentPreviewProps
       </section>
 
       <section>
-        <h2 className="text-lg font-bold border-b pb-2 mb-4">ജ്യോതിഷപരമായ വിശദാംശങ്ങൾ</h2>
+        <h2 className="mb-4 border-b  text-lg font-bold">
+          ജ്യോതിഷപരമായ വിശദാംശങ്ങൾ
+        </h2>
         <div className="space-y-2 text-sm">
           <PreviewField label="മലയാള മാസം" value={malayalamMonth} />
           <PreviewField label="ആരൂഢം രാശി" value={arudhamRashi} />
@@ -77,29 +136,40 @@ export default function AstroDocumentPreview({ data }: AstroDocumentPreviewProps
       </section>
 
       <section>
-        <h2 className="text-lg font-bold border-b pb-2 mb-4">പ്രശ്നചിന്തയും ഫലങ്ങളും</h2>
-        <div className="space-y-4 text-sm whitespace-pre-wrap">
+        <h2 className="mb-4 border-b text-lg font-bold">
+          പ്രശ്നചിന്തയും ഫലങ്ങളും
+        </h2>
+        <div className="space-y-4 whitespace-pre-wrap text-sm">
           <div>
             <h3 className="font-medium">ദീപം</h3>
-            <p>{deepam || 'വിവരങ്ങൾ ലഭ്യമല്ല.'}</p>
+            <p>{deepam || "വിവരങ്ങൾ ലഭ്യമല്ല."}</p>
           </div>
           <div>
             <h3 className="font-medium">പ്രശ്നചിന്ത</h3>
-            <p>{prasnaChintha || 'വിവരങ്ങൾ ലഭ്യമല്ല.'}</p>
+            <p>{prasnaChintha || "വിവരങ്ങൾ ലഭ്യമല്ല."}</p>
           </div>
         </div>
       </section>
 
-
-      {pariharangal && (
+      {(visiblePariharaTemples.length > 0 || pariharangal) && (
         <section>
-          <h2 className="text-lg font-bold border-b pb-2 mb-4">പരിഹാരങ്ങൾ</h2>
-          <div className="space-y-4 text-sm whitespace-pre-wrap">
-            <p>{pariharangal}</p>
+          <h2 className="mb-4 border-b  text-lg font-bold">പരിഹാരങ്ങൾ</h2>
+          <div className="space-y-4 whitespace-pre-wrap text-sm">
+            {visiblePariharaTemples.length > 0 ? (
+              visiblePariharaTemples.map((t, idx) => (
+                <div key={`${t.deity}-${t.temple}-${idx}`} className="">
+                  <h3 className="font-medium">
+                    {t.deity} — {t.temple}
+                  </h3>
+                  <p>{t.remedy}</p>
+                </div>
+              ))
+            ) : (
+              <p>{pariharangal}</p>
+            )}
           </div>
         </section>
       )}
-
     </div>
   );
 }

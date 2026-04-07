@@ -1,9 +1,20 @@
+export interface PariharaTemple {
+  name: string;
+  remedy: string;
+  enabled?: boolean;
+}
+
+export interface PariharaItem {
+  deity: string;
+  temples: PariharaTemple[];
+}
+
 export interface AstroData {
   name: string;
   dob: string;
   tob: string;
   pob: string;
-  gender: 'male' | 'female' | 'other';
+  gender: "male" | "female" | "other";
   predictions: string;
   age?: string;
   nakshatra?: string;
@@ -21,4 +32,5 @@ export interface AstroData {
   spashtangaRashi?: string;
   chandrarishti?: string;
   pariharangal?: string;
+  pariharaItems?: PariharaItem[];
 }

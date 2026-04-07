@@ -1,27 +1,5 @@
 "use client";
 
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Field,
-  FieldContent,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import type { AstroData } from "@/lib/types";
 import {
   Atom,
   BookOpen,
@@ -44,6 +22,38 @@ import {
   User,
   VenetianMask,
 } from "lucide-react";
+import type React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxItem,
+  ComboboxList,
+  useComboboxAnchor,
+} from "@/components/ui/combobox";
+import {
+  Field,
+  FieldContent,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import type { AstroData, PariharaItem } from "@/lib/types";
 
 interface AstroFormProps {
   data: AstroData;
@@ -64,6 +74,7 @@ const MALAYALAM_MONTHS = [
   "മിഥുനം",
   "കർക്കടകം",
 ];
+
 const RASHI_OPTIONS = [
   "മേടം",
   "ഇടവം",
@@ -78,6 +89,7 @@ const RASHI_OPTIONS = [
   "കുംഭം",
   "മീനം",
 ];
+
 const GRAHANGAL_OPTIONS = [
   "സൂര്യൻ",
   "ചന്ദ്രൻ",
@@ -89,13 +101,103 @@ const GRAHANGAL_OPTIONS = [
   "രാഹു",
   "കേതു",
 ];
+
 const CHANDRARISHTI_OPTIONS = ["ഉണ്ട്", "ഇല്ല"];
+
 const THAMBOOLAM_OPTIONS = ["വെറ്റില", "അടയ്ക്ക", "പഴം", "പണം"];
+
+const PARIHARAM_GOD_OPTIONS = [
+  "ശ്രീ ഗണപതി",
+  "ശിവൻ",
+  "പാർവതി ദേവി",
+  "ശ്രീകൃഷ്ണൻ",
+  "ശ്രീ മഹാവിഷ്ണു",
+  "അയ്യപ്പൻ",
+  "സുബ്രഹ്മണ്യൻ",
+  "ഹനുമാൻ",
+  "ഭദ്രകാളി",
+  "നാഗദേവത",
+] as const;
 
 const GENDER_OPTIONS = [
   { value: "male", label: "പുരുഷൻ" },
   { value: "female", label: "സ്ത്രീ" },
 ] as const;
+
+function getDefaultPariharam(deity: string) {
+  return `${deity} പ്രാർത്ഥന നടത്തുക`;
+}
+
+const TEMPLE_NAMES: Record<string, string[]> = {
+  "ശ്രീ ഗണപതി": [
+    "പഴവങ്ങാടി ഗണപതി ക്ഷേത്രം, തിരുവനന്തപുരം",
+    "കൊട്ടാരക്കര മഹാഗണപതി ക്ഷേത്രം, കൊല്ലം",
+    "മധൂർ ശ്രീ മദനന്തേശ്വര സിദ്ധിവിനായക ക്ഷേത്രം, കാസർഗോഡ്"
+  ],
+  "ശിവൻ": [
+    "വടക്കുന്നാഥൻ ക്ഷേത്രം, തൃശ്ശൂർ",
+    "വൈക്കം മഹാദേവ ക്ഷേത്രം, കോട്ടയം",
+    "ഏറ്റുമാനൂർ മഹാദേവ ക്ഷേത്രം, കോട്ടയം"
+  ],
+  "പാർവതി ദേവി": [
+    "ആറ്റുകാൽ ഭഗവതി ക്ഷേത്രം, തിരുവനന്തപുരം",
+    "ചോറ്റാനിക്കര ഭഗവതി ക്ഷേത്രം, എറണാകുളം",
+    "കടമ്പുഴ ഭഗവതി ക്ഷേത്രം, മലപ്പുറം"
+  ],
+  "ശ്രീകൃഷ്ണൻ": [
+    "ഗുരുവായൂർ ശ്രീകൃഷ്ണ ക്ഷേത്രം, തൃശ്ശൂർ",
+    "അമ്പലപ്പുഴ ശ്രീകൃഷ്ണ സ്വാമി ക്ഷേത്രം, ആലപ്പുഴ",
+    "തിരുവാർപ്പ് ശ്രീകൃഷ്ണ സ്വാമി ക്ഷേത്രം, കോട്ടയം"
+  ],
+  "ശ്രീ മഹാവിഷ്ണു": [
+    "ശ്രീ പത്മനാഭസ്വാമി ക്ഷേത്രം, തിരുവനന്തപുരം",
+    "തിരുനെല്ലി ക്ഷേത്രം, വയനാട്",
+    "തൃക്കാക്കര വാമനമൂർത്തി ക്ഷേത്രം, എറണാകുളം"
+  ],
+  "അയ്യപ്പൻ": [
+    "ശബരിമല ധർമ്മശാസ്താ ക്ഷേത്രം, പത്തനംതിട്ട",
+    "എരുമേലി ധർമ്മശാസ്താ ക്ഷേത്രം, കോട്ടയം",
+    "കുളത്തൂപ്പുഴ ധർമ്മശാസ്താ ക്ഷേത്രം, കൊല്ലം"
+  ],
+  "സുബ്രഹ്മണ്യൻ": [
+    "ഹരിപ്പാട് സുബ്രഹ്മണ്യ സ്വാമി ക്ഷേത്രം, ആലപ്പുഴ",
+    "ഉദയനാപുരം സുബ്രഹ്മണ്യ സ്വാമി ക്ഷേത്രം, കോട്ടയം",
+    "കിടങ്ങൂർ സുബ്രഹ്മണ്യ സ്വാമി ക്ഷേത്രം, കോട്ടയം"
+  ],
+  "ഹനുമാൻ": [
+    "ആലത്തിയൂർ ഹനുമാൻ ക്ഷേത്രം, മലപ്പുറം",
+    "കവിയൂർ ഹനുമാൻ ക്ഷേത്രം, പത്തനംതിട്ട",
+    "പാളയം ആഞ്ചനേയ ക്ഷേത്രം, തിരുവനന്തപുരം"
+  ],
+  "ഭദ്രകാളി": [
+    "കൊടുങ്ങല്ലൂർ ഭഗവതി ക്ഷേത്രം, തൃശ്ശൂർ",
+    "തിരുമാന്ധാംകുന്ന് ഭഗവതി ക്ഷേത്രം, മലപ്പുറം",
+    "പനയന്നാർകാവ് ദേവി ക്ഷേത്രം, പത്തനംതിട്ട"
+  ],
+  "നാഗദേവത": [
+    "മണ്ണാറശാല നാഗരാജ ക്ഷേത്രം, ആലപ്പുഴ",
+    "വെട്ടിക്കാട്ട് ആദിത്യപുരം നാഗരാജ ക്ഷേത്രം, ആലപ്പുഴ",
+    "പാമ്പുമ്മേക്കാട് മന, തൃശ്ശൂർ"
+  ]
+};
+
+function idSafe(s: string) {
+  return s.replace(/\s+/g, "-");
+}
+
+function serializePariharaItems(items: PariharaItem[]) {
+  // Flatten enabled temples across all parihara items and serialize them
+  return items
+    .flatMap((item) =>
+      (item.temples ?? []).filter((t) => t.enabled).map((t) => ({
+        deity: item.deity,
+        temple: t.name,
+        remedy: t.remedy,
+      })),
+    )
+    .map((x) => `${x.deity} - ${x.temple}\n${x.remedy}`)
+    .join("\n\n");
+}
 
 function FormField({
   id,
@@ -155,6 +257,10 @@ function SelectField({
 }
 
 export default function AstroForm({ data, setData }: AstroFormProps) {
+  const pariharamAnchor = useComboboxAnchor();
+  const pariharaItems = data.pariharaItems ?? [];
+  const selectedPariharams = pariharaItems.map((item) => item.deity);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -171,6 +277,94 @@ export default function AstroForm({ data, setData }: AstroFormProps) {
 
   const handleSelectChange = (name: keyof AstroData) => (value: string) => {
     setData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePariharaSelectionChange = (selectedValues: string[]) => {
+    setData((prev) => {
+      const nextItems = selectedValues.map((deity) => {
+        const existingItem = prev.pariharaItems?.find(
+          (item) => item.deity === deity,
+        );
+
+        if (existingItem) return existingItem;
+
+        const placeholders = TEMPLE_NAMES[deity] ?? [`${deity} ക്ഷേത്രം`];
+
+        const temples = placeholders.map((name) => ({
+          name,
+          remedy: "",
+          enabled: false,
+        }));
+
+        return { deity, temples };
+      });
+
+      return {
+        ...prev,
+        pariharaItems: nextItems,
+        pariharangal: serializePariharaItems(nextItems),
+      };
+    });
+  };
+  const handleTempleToggle = (
+    deity: string,
+    templeName: string,
+    enabled: boolean,
+  ) => {
+    setData((prev) => {
+      const nextItems =
+        prev.pariharaItems?.map((item) =>
+          item.deity === deity
+            ? {
+                ...item,
+                temples: item.temples.map((t) =>
+                  t.name === templeName
+                    ? {
+                        ...t,
+                        enabled,
+                        remedy:
+                          enabled && !t.remedy
+                            ? getDefaultPariharam(deity)
+                            : t.remedy,
+                      }
+                    : t,
+                ),
+              }
+            : item,
+        ) ?? [];
+
+      return {
+        ...prev,
+        pariharaItems: nextItems,
+        pariharangal: serializePariharaItems(nextItems),
+      };
+    });
+  };
+
+  const handleTempleRemedyChange = (
+    deity: string,
+    templeName: string,
+    remedy: string,
+  ) => {
+    setData((prev) => {
+      const nextItems =
+        prev.pariharaItems?.map((item) =>
+          item.deity === deity
+            ? {
+                ...item,
+                temples: item.temples.map((t) =>
+                  t.name === templeName ? { ...t, remedy } : t,
+                ),
+              }
+            : item,
+        ) ?? [];
+
+      return {
+        ...prev,
+        pariharaItems: nextItems,
+        pariharangal: serializePariharaItems(nextItems),
+      };
+    });
   };
 
   return (
@@ -238,7 +432,6 @@ export default function AstroForm({ data, setData }: AstroFormProps) {
           </FormField>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            
             <FormField
               id="dob"
               label="ജനന തീയതി (Date of Birth)"
@@ -274,32 +467,32 @@ export default function AstroForm({ data, setData }: AstroFormProps) {
               />
             </FormField>
             <FormField id="gender" label="ലിംഗം (Gender)" icon={VenetianMask}>
-                <RadioGroup
-                  value={data.gender}
-                  onValueChange={handleGenderChange}
-                  className="grid grid-cols-1 gap-3 sm:grid-cols-2"
-                >
-                  {GENDER_OPTIONS.map((option) => (
-                    <div
-                      key={option.value}
-                      className="flex items-center gap-2 rounded-md border px-3 py-2 lg:h-9"
-                    >
-                      <RadioGroupItem
-                        value={option.value}
-                        id={option.value}
-                        aria-label={option.label}
-                      />
-                      <Label htmlFor={option.value}>{option.label}</Label>
-                    </div>
-                  ))}
-                </RadioGroup>
+              <RadioGroup
+                value={data.gender}
+                onValueChange={handleGenderChange}
+                className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+              >
+                {GENDER_OPTIONS.map((option) => (
+                  <div
+                    key={option.value}
+                    className="flex items-center gap-2 rounded-md border px-3 py-2 lg:h-9"
+                  >
+                    <RadioGroupItem
+                      value={option.value}
+                      id={option.value}
+                      aria-label={option.label}
+                    />
+                    <Label htmlFor={option.value}>{option.label}</Label>
+                  </div>
+                ))}
+              </RadioGroup>
             </FormField>
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <SelectField
               id="malayalamMonth"
-              label="Malayala മാസം"
+              label="മലയാള മാസം"
               icon={BookOpen}
               value={data.malayalamMonth}
               options={MALAYALAM_MONTHS}
@@ -410,13 +603,91 @@ export default function AstroForm({ data, setData }: AstroFormProps) {
           </div>
 
           <FormField id="pariharangal" label="പരിഹാരങ്ങൾ" icon={Shield}>
-            <Textarea
-              id="pariharangal"
-              name="pariharangal"
-              value={data.pariharangal ?? ""}
-              onChange={handleChange}
-              placeholder="പരിഹാരങ്ങൾ ഇവിടെ നൽകുക"
-            />
+            <div className="space-y-3">
+              <Combobox
+                multiple
+                value={selectedPariharams}
+                onValueChange={(value) =>
+                  handlePariharaSelectionChange(
+                    Array.isArray(value) ? value : [],
+                  )
+                }
+              >
+                <ComboboxChips ref={pariharamAnchor}>
+                  {selectedPariharams.map((deity) => (
+                    <ComboboxChip key={deity}>{deity}</ComboboxChip>
+                  ))}
+                  <ComboboxChipsInput
+                    id="pariharangal"
+                    aria-label="പരിഹാരങ്ങൾ"
+                    placeholder="ദേവതകൾ തിരഞ്ഞെടുക്കുക"
+                  />
+                </ComboboxChips>
+                <ComboboxContent anchor={pariharamAnchor}>
+                  <ComboboxList>
+                    {PARIHARAM_GOD_OPTIONS.map((option) => (
+                      <ComboboxItem key={option} value={option}>
+                        {option}
+                      </ComboboxItem>
+                    ))}
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
+
+              <div className="space-y-3">
+                {pariharaItems.map((item) => (
+                  <div key={item.deity} className="space-y-2">
+                    <div className="font-medium">{item.deity}</div>
+
+                    <div className="space-y-2 pl-4">
+                      {item.temples.map((t) => (
+                        <div key={t.name} className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Checkbox
+                              id={`temple-checkbox-${idSafe(item.deity)}-${idSafe(
+                                t.name,
+                              )}`}
+                              checked={!!t.enabled}
+                              onCheckedChange={(checked) =>
+                                handleTempleToggle(
+                                  item.deity,
+                                  t.name,
+                                  typeof checked === "boolean" ? checked : false,
+                                )
+                              }
+                            />
+                            <Label
+                              htmlFor={`temple-checkbox-${idSafe(
+                                item.deity,
+                              )}-${idSafe(t.name)}`}
+                            >
+                              {t.name}
+                            </Label>
+                          </div>
+
+                          {t.enabled && (
+                            <Textarea
+                              id={`temple-remedy-${idSafe(item.deity)}-${idSafe(
+                                t.name,
+                              )}`}
+                              value={t.remedy}
+                              onChange={(event) =>
+                                handleTempleRemedyChange(
+                                  item.deity,
+                                  t.name,
+                                  event.target.value,
+                                )
+                              }
+                              placeholder={`${item.deity} ${t.name} പരിഹാരം`}
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </FormField>
         </FieldGroup>
       </CardContent>
